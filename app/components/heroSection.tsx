@@ -13,7 +13,7 @@ type Frames = {
 
 const frames: Frames = {
   currentIndex: 0,
-  maxIndex: 490, // Set to the total number of frames
+  maxIndex: 100, // Set to the total number of frames
 };
 
 export default function HeroSection() {
@@ -24,13 +24,13 @@ export default function HeroSection() {
 
   useEffect(() => {
     preLoadImages();
-    // window.addEventListener("resize", handleResize);
-    // return () => window.removeEventListener("resize", handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const preLoadImages = () => {
     for (let i = 1; i <= frames.maxIndex; i++) {
-      const imageUrl = `./vid/frame_${i.toString().padStart(4, "0")}.jpeg`;
+      const imageUrl = `/vid/frame_${i.toString().padStart(4, "0")}.jpeg`;
       const img = new Image();
       img.src = imageUrl;
       img.onload = () => {
@@ -81,47 +81,44 @@ export default function HeroSection() {
     if (!tlRef.current) {
       tlRef.current = gsap.timeline({
         scrollTrigger: {
-            trigger: ".parent",
-            scroller: "body",
-            start: "top top ",
-            end: "bottom 100%", // Adjust as needed to ensure sufficient scroll length
-            markers: true,
-            scrub: 2,
-            pin: true,
-            // onUpdate: (self) => {
-            //   const progress = self.progress;
-            //   const newIndex = Math.floor(progress * frames.maxIndex);
-            //   if (newIndex !== frames.currentIndex) {
-            //     loadImage(newIndex);
-            //   }
-            // },
-          }
+          trigger: ".parent",
+          scroller: "body",
+          start: "top top",
+          end: "200% 200%",
+          markers: true, // Set to false in production
+          scrub: 2,
+          pin: true,
+          // onUpdate: (self) => {
+          //   const progress = self.progress;
+          //   const newIndex = Math.floor(progress * frames.maxIndex);
+          //   if (newIndex !== frames.currentIndex) {
+          //     loadImage(newIndex);
+          //   }
+          // },
+        },
       });
 
       tlRef.current.to(frames, {
         currentIndex: frames.maxIndex,
-       
-          onUpdate: function (){
-          loadImage(Math.floor(frames.currentIndex))
+        onUpdate: () => {
+          loadImage(Math.floor(frames.currentIndex));
         },
         ease: "none", // Prevents easing between frames
       });
     }
   };
 
-//   const handleResize = () => {
-//     loadImage(frames.currentIndex);
-//   };
+  const handleResize = () => {
+    loadImage(frames.currentIndex);
+  };
 
   return (
-    <>
-      <div className="w-full a bg-zinc-900 h-screen">
-        <div className="parent relative top-0 left-0 w-full h-[900vh]">
-          <div className="w-full b sticky top-0 left-0 h-screen">
-            <canvas ref={canvasRef} id="canvas" className="w-full h-screen"></canvas>
-          </div>
+    <div className="w-full bg-zinc-900 h-screen">
+      <div className="parent relative top-0 left-0 w-full h-[700vh]">
+        <div className="w-full sticky top-0 left-0 h-screen">
+          <canvas ref={canvasRef} id="canvas" className="w-full h-screen"></canvas>
         </div>
       </div>
-    </>
+    </div>
   );
 }
